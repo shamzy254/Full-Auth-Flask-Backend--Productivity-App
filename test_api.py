@@ -31,6 +31,22 @@ def runner(app):
 
 class TestAuth:
     """Test authentication endpoints."""
+
+    def test_health_route(self, client):
+        """The health endpoint should return a valid JSON response."""
+        response = client.get('/health')
+        assert response.status_code == 200
+        assert response.json['status'] == 'ok'
+
+    def test_login_missing_user_returns_401_on_fresh_start(self):
+        """A fresh app should not crash when a non-existent user attempts login."""
+        app = create_app(config_name='testing')
+
+        response = app.test_client().post('/auth/login', json={
+            'email': 'missing@example.com',
+            'password': 'wrongpass'
+        })
+        assert response.status_code == 401
     
     def test_register_success(self, client):
         """Test successful user registration."""

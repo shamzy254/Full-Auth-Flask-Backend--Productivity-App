@@ -81,6 +81,24 @@ pipenv install gunicorn
 gunicorn -w 4 -b 0.0.0.0:5000 "app:create_app()"
 ```
 
+### Render Deployment
+
+The repository includes `render.yaml` for deploying the API as a Render web service.
+The service starts with Gunicorn bound to Render's required `$PORT` value:
+
+```bash
+gunicorn --bind 0.0.0.0:$PORT "app:create_app()"
+```
+
+Configure these environment variables in Render:
+
+- `FLASK_ENV=production`
+- `JWT_SECRET_KEY`: a strong random secret
+- `DATABASE_URL`: the production database connection string
+
+After deployment, verify the service with `GET /health`, which should return HTTP
+200 and `{"status": "ok"}`.
+
 ## Environment Variables
 
 Create a `.env` file in the project root to configure:
@@ -100,6 +118,21 @@ All endpoints (except `/auth/register` and `/auth/login`) require a valid JWT to
 ```
 Authorization: Bearer <access_token>
 ```
+
+### Service Endpoints
+
+#### API Overview
+- **GET** `/`
+- Returns the service status and the main available routes.
+
+#### Health Check
+- **GET** `/health`
+- **Response** (200 OK):
+  ```json
+  {
+    "status": "ok"
+  }
+  ```
 
 ### Authentication Endpoints
 
@@ -315,17 +348,6 @@ Authorization: Bearer <access_token>
   - 404: Note not found
   - 500: Server error during deletion
 
-### Health Check Endpoint
-
-#### Health Check
-- **GET** `/health`
-- **Response** (200 OK):
-  ```json
-  {
-    "status": "ok"
-  }
-  ```
-
 ## Testing
 
 ### Using Postman
@@ -354,6 +376,9 @@ Run the test suite:
 ```bash
 pipenv run pytest
 ```
+
+The current test suite covers authentication, note access control, health checks,
+and fresh-start login behavior. A successful run should report 13 passing tests.
 
 To run tests with coverage:
 
