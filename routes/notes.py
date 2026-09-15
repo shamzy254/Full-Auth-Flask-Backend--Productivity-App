@@ -123,7 +123,7 @@ def get_note(note_id):
     - 404: Note not found
     """
     user_id = get_jwt_identity()
-    note = Note.query.get(note_id)
+    note = db.session.get(Note, note_id)
     
     if not note:
         return {'error': 'Note not found'}, 404
@@ -154,7 +154,7 @@ def update_note(note_id):
     - 404: Note not found
     """
     user_id = get_jwt_identity()
-    note = Note.query.get(note_id)
+    note = db.session.get(Note, note_id)
     
     if not note:
         return {'error': 'Note not found'}, 404
@@ -199,7 +199,7 @@ def delete_note(note_id):
     - 404: Note not found
     """
     user_id = get_jwt_identity()
-    note = Note.query.get(note_id)
+    note = db.session.get(Note, note_id)
     
     if not note:
         return {'error': 'Note not found'}, 404
